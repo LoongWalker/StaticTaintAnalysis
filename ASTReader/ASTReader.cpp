@@ -1,6 +1,7 @@
 #include "AST.h"
 #include "callgraph.h"
 #include "classTmap.h"
+#include "CFGtattr.h"
 //Callgraph
 std::vector<callgraph*> Callgraph;
 std::vector<classTmap*> ClassTmap;
@@ -48,7 +49,7 @@ int main(int argc, char *argv[]) {
 			}
 			//添加类变量decl(类型为fieldDecl*)
 			//FieldDecl* fd;
-			
+
 			ASTFieldDeclLoad loadClassVar;
 			std::vector<FieldDecl*> fds;
 			std::vector<FieldDecl*>::iterator it_fds;
@@ -96,7 +97,7 @@ int main(int argc, char *argv[]) {
 	if (Callgraph.size() > 0)
 	{
 		FunctionDecl* cur;
-		for ( it_callgraph= Callgraph.begin(); it_callgraph != Callgraph.end(); it_callgraph++)
+		for (it_callgraph = Callgraph.begin(); it_callgraph != Callgraph.end(); it_callgraph++)
 		{
 			cur = (*it_callgraph)->getCur();
 			ASTCallExprLoad load2;
@@ -145,17 +146,17 @@ int main(int argc, char *argv[]) {
 		//添加调用本函数的其他函数caller
 		for (it_func_decl = func.begin(); it_func_decl != func.end(); it_func_decl++)
 		{
-			ASTCallExprLoad load2;
-			load2.TraverseStmt((*it_func_decl)->getBody());
-			callExpr = load2.getCallExprs();
-			for (it_call_expr = callExpr.begin(); it_call_expr != callExpr.end(); it_call_expr++)
-			{
-				for (it_callgraph = Callgraph.begin(); it_callgraph != Callgraph.end(); it_callgraph++)
-				{
-					if ((*it_callgraph)->getCur() == (*it_call_expr)->getDirectCallee())
-						(*it_callgraph)->addCaller(*it_func_decl);
-				}
-			}
+		ASTCallExprLoad load2;
+		load2.TraverseStmt((*it_func_decl)->getBody());
+		callExpr = load2.getCallExprs();
+		for (it_call_expr = callExpr.begin(); it_call_expr != callExpr.end(); it_call_expr++)
+		{
+		for (it_callgraph = Callgraph.begin(); it_callgraph != Callgraph.end(); it_callgraph++)
+		{
+		if ((*it_callgraph)->getCur() == (*it_call_expr)->getDirectCallee())
+		(*it_callgraph)->addCaller(*it_func_decl);
+		}
+		}
 		}
 		*/
 	}
@@ -165,18 +166,17 @@ int main(int argc, char *argv[]) {
 
 	resetIfCheck(Callgraph);
 	ifcheck(Callgraph, *Callgraph.begin());
-	
+
 	printCallGraph(Callgraph);
 
 	printClassTmap(ClassTmap);
-	
+
 	std::vector<callgraph*>::iterator it3;
 	it3 = Callgraph.begin();
 	for (; it3 != Callgraph.end(); it3++)
 	{
 		checkCFG((*it3)->get_cfg(), (*it3)->getCTmap(), *it3);
 	}
-	
+
 	return 0;
 }
-
