@@ -96,7 +96,7 @@ void ifcheck(std::vector<callgraph*> cg, callgraph* t)
 	t->ifCheck = -1;
 	std::vector<FunctionDecl*>::iterator it_callee;
 	std::vector<FunctionDecl*> callee = t->getCallee();
-	for (it_callee=callee.begin(); it_callee != callee.end(); it_callee++)
+	for (it_callee = callee.begin(); it_callee != callee.end(); it_callee++)
 	{
 		FunctionDecl* tempt = *it_callee;
 		callgraph* tempc = findById(cg, tempt->getQualifiedNameAsString());
@@ -129,7 +129,7 @@ void getRing(std::vector<callgraph*>&Callgraph, int n, std::vector<FunctionDecl*
 	std::vector<callgraph*>::iterator it, it4;
 	std::vector<FunctionDecl*>::iterator it2, it3;
 	std::vector<FunctionDecl*>::iterator it_callee;
-	
+
 	//FunctionDecl* temp;
 	it = Callgraph.begin() + n;
 	if ((*it)->ifCheck == 0)//new node
@@ -137,7 +137,7 @@ void getRing(std::vector<callgraph*>&Callgraph, int n, std::vector<FunctionDecl*
 		std::vector<FunctionDecl*> callee = (*it)->getCallee();
 		ringVector.push_back((*it)->getCur());
 		(*it)->ifCheck = -1;
-		for (it_callee=callee.begin(); it_callee!=callee.end(); it_callee++)
+		for (it_callee = callee.begin(); it_callee != callee.end(); it_callee++)
 		{
 			for (it4 = Callgraph.begin(); it4 < Callgraph.end(); it4++)
 				if ((*it4)->getCur() == *it_callee)
@@ -211,7 +211,7 @@ void printCallGraph(std::vector<callgraph*> Callgraph)
 
 		int j = (*it3)->getCallerNum();
 		std::cout << "\tcaller:" << j << "\n";
-		for (it_call = caller.begin(); it_call!=caller.end(); it_call++)
+		for (it_call = caller.begin(); it_call != caller.end(); it_call++)
 			std::cout << "\t\t" << (*it_call)->getQualifiedNameAsString() << "\n";
 		j = (*it3)->getCalleeNum();
 		std::cout << "\tcallee:" << j << "\n";
