@@ -1,3 +1,7 @@
+#ifndef CALLGRAPH_H
+#define CALLGRAPH_H
+
+
 #include "AST.h"
 
 typedef enum
@@ -57,3 +61,4 @@ void ifcheck(std::vector<callgraph*> cg, callgraph* t);
 void resetIfCheck(std::vector<callgraph*>Callgraph);
 void getRing(std::vector<callgraph*>& Callgraph, int n, std::vector<FunctionDecl*>& ringVector);
 void printCallGraph(std::vector<callgraph*> Callgraph);
+#endif
