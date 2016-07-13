@@ -1,83 +1,55 @@
 #include"CFGtattr.h"
+#include "callgraph.h"
 #include"AST.h"
-
 //对函数的CFG进行迭代分析
-void checkCFG(clang::CFG &cfg, CTmap &tm, callgraph *cg)
+void checkCFG(std::unique_ptr<CFG> &cfg, CTmap &tm, callgraph *cg)
 {
-	clang::CFGBlock* CFGentry = &(cfg.getEntry()), *CFGexit = &(cfg.getExit());
-	clang::CFGBlock::pred_iterator pred_it, pred_end;
+
+	clang::CFGBlock* CFGentry = &((*cfg).getEntry()), *CFGexit = &((*cfg).getExit());
+	clang::CFGBlock::succ_iterator succ_it, succ_end;
 
 	CTmap *outm = NULL, *inm = NULL;
 	map<clang::CFGBlock *, CFGInOut> block_io_map;
 
-	build_block_io_table(block_io_map, CFGexit, CFGentry, tm);
-	cg->print_cfg();
-	//printiotable(block_io_map);
+	//cout << "test B" << CFGentry->getBlockID() << endl;
+	//return;
+	//cg->print_cfg();
 
+	build_block_io_table(block_io_map, CFGexit, CFGentry, tm);
+	printiotable(block_io_map);
 	//主循环，当无OUT发生改变时跳出循环
 	while (1)
 	{
 		bool changed = false;
-
 		//为每个block计算其新的out
-		int i = 0;
-		for (map<clang::CFGBlock *, CFGInOut>::iterator it1 = block_io_map.begin(), end1 = block_io_map.end(); i <= 8; i++, it1++)
+		for (map<clang::CFGBlock *, CFGInOut>::iterator it = block_io_map.begin(), end = block_io_map.end(); it != end; it++)
 		{
-			VarDecl *a, *b;
-			b = it1->second.GetIN()->get_VarDecl(1);
-			it1->second.GetIN()->var_attr_set(b, TAINTED, 0);
-			it1->second.GetOUT()->var_attr_set(b, TAINTED, 0);
-			if (i <= 6)
-			{
-				a = it1->second.GetIN()->get_VarDecl(0);
-				it1->second.GetOUT()->var_attr_set(a, TAINTED, 0);
-				it1->second.GetIN()->var_attr_set(a, TAINTED, 0);
-			}
-			if (i == 2)
-			{
-				a = it1->second.GetIN()->get_VarDecl(0);
-				it1->second.GetIN()->var_attr_set(a, TAINTED, 0);
-				it1->second.GetOUT()->var_attr_set(a, TAINTED, 0);
-			}
-		}
-		i = 0;
-		for (map<clang::CFGBlock *, CFGInOut>::reverse_iterator r_iter = block_io_map.rbegin(), r_end = block_io_map.rend(); r_iter != r_end; r_iter++)
-		{
-			i++;
-			//block-in = 前驱的并
+			//block-in = Upred it->pred
 			//即对block的前驱的out求并，作为该block的in
-			pred_it = r_iter->first->succ_begin(), pred_end = r_iter->first->succ_end();
+			succ_it = it->first->succ_begin(), succ_end = it->first->succ_end();
 			clang::CFGBlock* temp = NULL;
-
-			//清空原来的in，并用前驱的out的并来生成新的in
-			if (r_iter->first != &cfg.getEntry())
+			inm = it->second.GetIN();
+			inm->clear();
+			inm->CopyMap(tm);
+			while (succ_it != succ_end)
 			{
-				inm = r_iter->second.GetIN();
-				inm->clear();
-				inm->CopyMap(tm);
-			}
-
-			while (pred_it != pred_end)
-			{
-				temp = pred_it->getReachableBlock();
+				temp = succ_it->getReachableBlock();
 				outm = block_io_map[temp].GetOUT();
 				inm->AndMap(*outm);
-				pred_it++;
+				succ_it++;
 			}
 
-			outm = r_iter->second.GetOUT();
+			outm = it->second.GetOUT();
 			outm->CopyMap(*inm);
 
 			//checkblock, modify changed
-			
-		}
 
-		//迭代至所有block的OUT都不发生改变，跳出循环
+		}
 		if (changed == false)
 			break;
 	}
 	//here to add output
-	printiotable(block_io_map);
+
 }
 
 //为每个语句块创建INOUT污染表
@@ -85,6 +57,7 @@ void build_block_io_table(map<clang::CFGBlock *, CFGInOut> &block_io_map, clang:
 {
 	map<clang::CFGBlock *, CFGInOut>::iterator t = block_io_map.find(block);
 
+	cout << "create B" << block->getBlockID() << endl;
 	//判断该块是否已添加过
 	if (t != block_io_map.end())
 		return;
@@ -107,12 +80,11 @@ void build_block_io_table(map<clang::CFGBlock *, CFGInOut> &block_io_map, clang:
 //打印一个block的污染信息
 void printBlockMsg(map<clang::CFGBlock *, CFGInOut> &block_io_map, clang::CFGBlock *block)
 {
-	cout << endl << "============" << endl;
-	cout << "B" << block->getBlockID() << ":" << endl << "IN" << endl;
+	block->getBlockID();
+	cout << endl << "B" << block->getBlockID() << ":" << endl << "IN" << endl;
 	block_io_map[block].GetIN()->output();
-	cout << endl << "OUT"<<endl;
+	cout << endl << "OUT";
 	block_io_map[block].GetOUT()->output();
-	cout << "============" << endl;
 }
 
 //打印当前函数中每个block的污染信息
