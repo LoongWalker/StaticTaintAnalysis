@@ -37,10 +37,14 @@ public:
 	{
 		IN.CopyMap(tm);
 		OUT.CopyMap(tm);
+		cout << "in" << endl;
+		IN.output();
+		cout << "out" << endl;
+		OUT.output();
 	}
 };
 
-void checkCFG(clang::CFG &cfg, CTmap &tm, callgraph *cg);
+void checkCFG(std::unique_ptr<CFG> &cfg, CTmap &tm, callgraph *cg);
 void build_block_io_table(map<clang::CFGBlock *, CFGInOut> &block_io_map, clang::CFGBlock *CFGexit, clang::CFGBlock *block, CTmap &tm);
 void printBlockMsg(map<clang::CFGBlock *, CFGInOut> &block_io_map, clang::CFGBlock *block);
 void printiotable(map<clang::CFGBlock *, CFGInOut> &block_io_map);
