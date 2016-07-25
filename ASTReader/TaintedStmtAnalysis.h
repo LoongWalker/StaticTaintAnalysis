@@ -16,10 +16,11 @@ using namespace llvm;
 
 
 bool checkblock(CFGBlock* cfgb, CTmap &out, callgraph* cg);
-bool checkCond(const Stmt* stmt,CTmap &out, callgraph* cg);
+bool checkCond(const Stmt* stmt, CTmap &out, callgraph* cg);
 int Stmt_analysis(const Stmt* stmt, CTmap &out, callgraph* cg);
 Tainted_Attr* Expr_analysis(const Expr* expr, CTmap &out, callgraph* cg);
 Tainted_Attr* BinaryOperator_Expr_analysis(const Expr* expr, CTmap &out, callgraph* cg);
+Tainted_Attr* CompoundAssignOperator_Expr_analysis(const Expr* expr, CTmap &out, callgraph* cg);
 Tainted_Attr* CallExpr_analysis(const Expr* expr, CTmap &out, callgraph* cg);
 Tainted_Attr* ArrayExpr_analysis(const Expr* expr, CTmap &out, callgraph* cg);
 
