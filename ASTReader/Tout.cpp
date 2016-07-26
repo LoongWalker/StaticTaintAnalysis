@@ -95,7 +95,8 @@ Ttable::Node* Ttable::makeTnode(string&  line, string& function, int TYPE)
 	/*--------------------------------*/
 	int num = line.find(':', 2);
 	string test_line;
-	test_line.insert(0, line, num + 1, 1);
+	int num2 = line.find(':', num+1);
+	test_line.insert(0, line, num + 1, num2);
 //	cout << test_line << endl;
 	string test_file;
 	test_file.insert(0, line, 0, num);
